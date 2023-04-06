@@ -1,0 +1,29 @@
+FROM node:19.8.1-alpine3.17
+
+# stop playwright from downloading browsers
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD 1
+
+# install node-gyp dependencies and some other things
+
+#RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+
+#RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+#  --mount=type=cache,target=/var/lib/apt,sharing=locked \
+
+RUN apk update && apk add --no-cache git nano bash wget libc6-compat python3 make g++
+
+
+# add some useful globals
+RUN npm install -g node-gyp rimraf dotenv-cli turbo typescript delay-cli cross-env @nestjs/cli
+
+RUN npm install -g bcrypt
+
+RUN wget -q -t3 'https://packages.doppler.com/public/cli/rsa.8004D9FF50437357.key' -O /etc/apk/keys/cli@doppler-8004D9FF50437357.rsa.pub
+RUN echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories
+RUN apk add --no-cache doppler
+
+# terminal quality-of-life env
+ENV LANGUAGE=C.UTF-8
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+ENV TERM=xterm-256color
